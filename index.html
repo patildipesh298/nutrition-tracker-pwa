@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f766e" />
+  <title>NutriFamily Elder Pro</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <section id="authScreen" class="auth-screen hidden">
+    <div class="auth-visual">
+      <div class="hero-art-wrap">
+        <img src="assets/family-wellness-hero.svg" alt="Family wellness dashboard illustration" class="hero-art" />
+        <div class="floating-card fc-one">Vitals • Reports • Care Plan</div>
+        <div class="floating-card fc-two">Food • Water • Exercise</div>
+        <div class="floating-card fc-three">AI Daily Wellness Coach</div>
+      </div>
+    </div>
+    <div class="auth-card glass">
+      <div class="brand-row"><div class="brand-mark">NF</div><div><h1>NutriFamily Elder Pro</h1><p>Premium family nutrition, elder care and wellness tracking.</p></div></div>
+      <div class="auth-benefits"><span>✓ Elder-safe</span><span>✓ AI wellness plan</span><span>✓ Reports & vitals</span></div>
+      <button onclick="signInWithGoogle()" class="primary full">Continue with Google</button>
+      <div class="divider"><span>or email login</span></div>
+      <label>Email<input id="authEmail" type="email" placeholder="you@example.com" autocomplete="email" /></label>
+      <label>Password<input id="authPassword" type="password" placeholder="Minimum 6 characters" autocomplete="current-password" /></label>
+      <div class="two-actions"><button onclick="emailSignIn()" class="primary">Sign in</button><button onclick="emailSignUp()" class="secondary">Create account</button></div>
+      <p id="authMessage" class="micro"></p>
+      <p class="micro strong">Wellness tracking only. Not for diagnosis, emergency care, or medication decisions.</p>
+    </div>
+  </section>
+
+  <main id="app" class="app hidden">
+    <header class="topbar glass">
+      <div class="brand-row"><div class="brand-mark">NF</div><div><p class="eyebrow">Professional family wellness dashboard</p><h1>NutriFamily Elder Pro</h1></div></div>
+      <div class="top-actions"><button onclick="syncNow()" class="secondary">Save / Sync</button><button onclick="signOut()" class="ghost">Logout</button></div>
+    </header>
+
+    <section class="welcome-hero glass">
+      <div class="welcome-copy">
+        <p class="eyebrow">Family wellness operating system</p>
+        <h2>Track meals, elder vitals, reports, movement and AI wellness guidance in one beautiful place.</h2>
+        <p>Built for families who want simple daily visibility, safer routines and practical nutrition guidance across phone, tablet and desktop.</p>
+        <div class="hero-metrics">
+          <span><b>8</b> health modules</span>
+          <span><b>24/7</b> family tracking</span>
+          <span><b>AI</b> wellness coach</span>
+        </div>
+      </div>
+      <img src="assets/family-wellness-hero.svg" alt="Nutrition and elder health dashboard" />
+    </section>
+
+    <section class="medical-banner">
+      <strong>Safety first:</strong> This app organizes nutrition, vitals, exercise, and reports for general wellness. It does not diagnose, prescribe, or replace a doctor/registered dietitian. For diabetes, BP, kidney, heart, thyroid, abnormal labs, pregnancy, or medication-related changes, confirm with a clinician.
+    </section>
+
+    <nav class="tabs glass" aria-label="Main navigation">
+      <button class="active" data-tab="dashboard" onclick="showTab('dashboard')">Dashboard</button>
+      <button data-tab="profile" onclick="showTab('profile')">Profile</button>
+      <button data-tab="food" onclick="showTab('food')">Food</button>
+      <button data-tab="health" onclick="showTab('health')">Elder Health</button>
+      <button data-tab="reports" onclick="showTab('reports')">Reports</button>
+      <button data-tab="exercise" onclick="showTab('exercise')">Exercise</button>
+      <button data-tab="care" onclick="showTab('care')">Care Plan</button>
+      <button data-tab="ai" onclick="showTab('ai')">AI Coach</button>
+    </nav>
+
+    <section id="dashboard" class="tab-panel">
+      <div class="hero-grid">
+        <article class="card score-card hero-card">
+          <div class="row-between"><div><p class="eyebrow">Today’s readiness</p><h2 id="dashName">Profile</h2><p id="scoreText" class="muted">Start by saving profile and logging meals.</p></div><div class="score-ring"><strong id="nutritionScore">0</strong><span>/100</span></div></div>
+          <div class="progress-block"><div class="row-between small"><span>Calories</span><span id="calorieProgressText">0%</span></div><div class="progress"><span id="calorieProgress"></span></div></div>
+          <div class="mini-grid four"><div><b id="calConsumed">0</b><span>Calories</span></div><div><b id="proteinConsumed">0g</b><span>Protein</span></div><div><b id="waterCount">0</b><span>Water</span></div><div><b id="stepsCount">0</b><span>Steps</span></div></div>
+          <div id="healthScoreBreakdown" class="health-score-breakdown"></div>
+        </article>
+        <article class="card quick-card">
+          <p class="eyebrow">Fast actions</p><h2>Quick Add</h2>
+          <div class="quick-grid"><button onclick="quickWater()">+ Water</button><button onclick="quickSteps()">+ 1,000 Steps</button><button onclick="showTab('food')">+ Food</button><button onclick="showTab('health')">+ Vitals</button></div>
+          <div id="riskPanel" class="risk-panel"></div>
+        </article>
+      </div>
+
+      <div class="kpi-grid five">
+        <div class="kpi"><span>Target kcal</span><b id="targetCalories">0</b></div>
+        <div class="kpi"><span>Protein target</span><b id="targetProtein">0g</b></div>
+        <div class="kpi"><span>Sugar today</span><b id="sugarConsumed">0g</b></div>
+        <div class="kpi"><span>Fiber target</span><b id="targetFiber">0g</b></div>
+        <div class="kpi"><span>Sodium limit</span><b id="targetSodium">0mg</b></div>
+      </div>
+
+      <div class="charts-grid">
+        <article class="card"><div class="row-between"><h2>Macro Energy Split</h2><span class="pill">Protein / Carbs / Fat</span></div><canvas id="macroChart"></canvas></article>
+        <article class="card"><div class="row-between"><h2>7-day Calories</h2><span class="pill">Trend</span></div><canvas id="calorieChart"></canvas></article>
+        <article class="card"><div class="row-between"><h2>Vitals Trend</h2><span class="pill">BP & Sugar</span></div><canvas id="vitalChart"></canvas></article>
+        <article class="card"><div class="row-between"><h2>7-day Sugar Trend</h2><span class="pill">Sugar awareness</span></div><canvas id="sugarTrendChart"></canvas></article>
+      </div>
+
+      <section class="lifestyle-grid">
+        <article class="visual-card"><img src="assets/nutrition-bowl.svg" alt="Balanced nutrition bowl" /><div><h3>Smart meal balance</h3><p>Combine local Indian foods, USDA data and packaged food scans to understand calories, protein, fiber and sodium.</p></div></article>
+        <article class="visual-card"><img src="assets/elder-exercise.svg" alt="Elder safe chair exercise" /><div><h3>Elder-safe movement</h3><p>Gentle walking, chair mobility, balance and stretching routines with safety-first guidance.</p></div></article>
+        <article class="visual-card"><img src="assets/health-reports.svg" alt="Health report tracking" /><div><h3>Reports made usable</h3><p>Upload reports and enter key lab values so family members can see history and doctor questions clearly.</p></div></article>
+      </section>
+
+      <article class="card"><div class="row-between"><h2>Nutritionist-style Wellness Suggestions</h2><span class="pill">General guidance</span></div><div id="recommendations" class="recommendations"></div></article>
+    </section>
+
+    <section id="profile" class="tab-panel hidden">
+      <article class="card">
+        <div class="row-between"><div><p class="eyebrow">Personalization</p><h2>Create / Edit Profile</h2></div><span class="pill">One profile per login</span></div>
+        <div class="form-grid">
+          <label>Full name<input id="pName" placeholder="e.g. Dad, Mom, Pratik" /></label>
+          <label>Age<input id="pAge" type="number" min="1" placeholder="65" /></label>
+          <label>Gender<select id="pGender"><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></label>
+          <label>Height (cm)<input id="pHeight" type="number" placeholder="170" /></label>
+          <label>Weight (kg)<input id="pWeight" type="number" placeholder="70" /></label>
+          <label>Activity level<select id="pActivity"><option value="1.2">Sedentary</option><option value="1.375">Light activity</option><option value="1.55">Moderate activity</option><option value="1.725">Very active</option></select></label>
+          <label>Goal<select id="pGoal"><option value="maintain">Maintain weight</option><option value="loss">Weight loss</option><option value="gain">Muscle gain</option><option value="elder-maintain">Elder balanced maintenance</option></select></label>
+          <label>Diet preference<select id="pDiet"><option>Vegetarian</option><option>Non-vegetarian</option><option>Eggetarian</option><option>Vegan</option><option>Jain</option></select></label>
+          <label>Primary cuisine<select id="pCuisine"><option>Indian</option><option>Mixed Indian + Global</option><option>Global</option></select></label>
+          <label>Known conditions<select id="pConditions" multiple><option value="diabetes">Diabetes / sugar</option><option value="hypertension">High BP</option><option value="cholesterol">Cholesterol</option><option value="kidney">Kidney concern</option><option value="thyroid">Thyroid</option><option value="arthritis">Joint pain / arthritis</option><option value="heart">Heart condition</option></select></label>
+          <label>Allergies / restrictions<input id="pAllergies" placeholder="peanuts, lactose, low salt" /></label>
+          <label>Emergency contact<input id="pEmergency" placeholder="Name + phone" /></label>
+          <label class="wide">Medicines<textarea id="pMedicines" placeholder="Medicine name, dose, timing"></textarea></label>
+          <label class="wide">Doctor / dietitian notes<textarea id="pDoctorNotes" placeholder="Diet limits, exercise restrictions, fluid restriction, etc."></textarea></label>
+        </div>
+        <div class="target-preview" id="targetPreview"></div>
+        <button onclick="saveProfile()" class="primary full">Save profile and calculate targets</button>
+      </article>
+    </section>
+
+    <section id="food" class="tab-panel hidden">
+      <article class="card food-hero-card">
+        <div class="row-between">
+          <div><p class="eyebrow">Smart nutrition tracking</p><h2>Sugar, Calories & Portions</h2><p class="muted">Search food, enter exact grams/ml, save favorites, and track sugar-friendly meal choices from your phone.</p></div>
+          <span class="pill">Mobile quick add</span>
+        </div>
+        <div class="food-summary-grid">
+          <div><span>Calories</span><b id="foodCalSummary">0</b><small id="foodCalSummaryLabel">kcal selected day</small></div>
+          <div><span>Sugar</span><b id="foodSugarSummary">0g</b><small>selected day sugar</small></div>
+          <div><span>Protein</span><b id="foodProteinSummary">0g</b><small>muscle & satiety</small></div>
+          <div><span>Fiber</span><b id="foodFiberSummary">0g</b><small>sugar control support</small></div>
+        </div>
+      </article>
+
+      <article class="card food-date-card">
+        <div class="row-between food-date-header">
+          <div>
+            <p class="eyebrow">Daily food diary</p>
+            <h2 id="selectedFoodDateTitle">Track Food by Day</h2>
+            <p class="muted">Choose any day, then add breakfast, lunch, dinner, or snacks for that specific date.</p>
+          </div>
+          <div class="date-control-wrap">
+            <button class="ghost" onclick="moveFoodDate(-1)">← Previous</button>
+            <label class="compact-date-label">Date
+              <input id="foodTrackingDate" type="date" onchange="changeFoodDate(this.value)" />
+            </label>
+            <button class="ghost" onclick="moveFoodDate(1)">Next →</button>
+            <button class="primary" onclick="setFoodDateToday()">Today</button>
+          </div>
+        </div>
+        <div class="daily-meal-summary" id="dailyMealSummary"></div>
+      </article>
+
+      <article class="card voice-food-card">
+        <div class="voice-food-layout">
+          <div>
+            <p class="eyebrow">AI Voice Food Logger</p>
+            <h2>Tell NutriFamily what you ate</h2>
+            <p class="muted">Say things like “Add 2 chapatis and 250 ml milk for breakfast” or “I had 150 grams rice and dal for lunch.” Items are saved to the selected diary date above. Voice recordings are not stored; only the confirmed food log is saved.</p>
+          </div>
+          <div class="voice-actions">
+            <button id="voiceFoodBtn" class="primary mic-button" onclick="startVoiceFoodLogger()">🎙️ Start speaking</button>
+            <button class="ghost" onclick="parseTypedFoodLog()">Parse typed text</button>
+          </div>
+        </div>
+        <label class="voice-text-label">Food sentence
+          <textarea id="voiceFoodText" rows="3" placeholder="Example: Add 2 chapatis, 1 cup tea, and one banana for breakfast at 8 AM"></textarea>
+        </label>
+        <div class="voice-helper-row">
+          <span id="voiceFoodStatus" class="muted">Ready. Chrome/Edge on mobile or desktop works best for voice input.</span>
+        </div>
+        <div id="voiceFoodPreview" class="voice-preview"></div>
+      </article>
+
+      <div class="two-column food-layout">
+        <article class="card">
+          <div class="row-between"><div><p class="eyebrow">Food database</p><h2>Search & Add Food</h2></div><span class="pill">Local + USDA + Open Food Facts</span></div>
+          <div class="form-grid two">
+            <label>Food name or smart entry<input id="foodQuery" placeholder="Example: 2 roti, 250 ml milk, 150g rice lunch" onkeydown="if(event.key==='Enter') searchFood()" /></label>
+            <label>Meal<select id="mealType"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snacks</option></select></label>
+          </div>
+          <div id="smartFoodSuggestions" class="smart-food-suggestions"></div>
+          <button onclick="searchFood()" class="primary full">Search and add food</button>
+          <div id="foodResults" class="results food-results"></div>
+        </article>
+
+        <article class="card">
+          <div class="row-between"><div><p class="eyebrow">Quick access</p><h2>Favorite Foods</h2></div><button class="ghost" onclick="clearFavorites()">Clear</button></div>
+          <p class="muted">Tap a favorite to add it with grams/ml. Use this for daily foods like roti, dal, rice, milk, tea, fruit, or protein items.</p>
+          <div id="favoriteFoods" class="favorite-foods"></div>
+          <div class="section-divider"></div>
+          <div class="row-between"><div><p class="eyebrow">One tap repeat</p><h2>Recent Foods</h2></div></div>
+          <div id="recentFoods" class="recent-foods"></div>
+        </article>
+      </div>
+
+      <article class="card">
+        <div class="row-between"><div><p class="eyebrow">Manual entry</p><h2>Add Custom Food</h2></div><span class="pill">Per 100g / 100ml</span></div>
+        <div class="form-grid three">
+          <label>Food name<input id="manualFoodName" placeholder="Homemade poha, tea, sabzi..." /></label>
+          <label>Base unit<select id="manualFoodUnit"><option value="g">per 100g</option><option value="ml">per 100ml</option></select></label>
+          <label>Meal<select id="manualMealType"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snacks</option></select></label>
+          <label>Calories<input id="manualCal" type="number" step="0.1" placeholder="kcal per 100" /></label>
+          <label>Protein (g)<input id="manualProtein" type="number" step="0.1" /></label>
+          <label>Carbs (g)<input id="manualCarbs" type="number" step="0.1" /></label>
+          <label>Fat (g)<input id="manualFat" type="number" step="0.1" /></label>
+          <label>Fiber (g)<input id="manualFiber" type="number" step="0.1" /></label>
+          <label>Sugar (g)<input id="manualSugar" type="number" step="0.1" /></label>
+          <label>Sodium (mg)<input id="manualSodium" type="number" step="1" /></label>
+          <label>Quantity<input id="manualQty" type="number" min="1" step="1" value="100" /></label>
+          <label>Quantity unit<select id="manualQtyUnit"><option value="g">g</option><option value="ml">ml</option><option value="serving">serving</option></select></label>
+        </div>
+        <button onclick="addManualFood()" class="primary full">Add custom food</button>
+      </article>
+
+      <article class="card"><div class="row-between"><div><p class="eyebrow">Selected day log</p><h2 id="mealLogTitle">Meals</h2></div><button class="ghost" onclick="clearSelectedDayFoods()">Clear selected day</button></div><div id="mealLog"></div></article>
+
+      <article class="card month-food-card">
+        <div class="row-between">
+          <div><p class="eyebrow">Monthly view</p><h2 id="foodMonthTitle">Monthly Food Tracking</h2></div>
+          <span class="pill">Calories + Sugar</span>
+        </div>
+        <p class="muted">Review which days are logged, compare daily sugar/calories, and tap any day to continue logging.</p>
+        <div id="foodMonthStats" class="month-stats-grid"></div>
+        <div id="foodMonthCalendar" class="food-month-calendar"></div>
+      </article>
+    </section>
+
+    <section id="health" class="tab-panel hidden">
+      <article class="card">
+        <div class="row-between"><div><p class="eyebrow">Elder daily check-in</p><h2>Vitals, symptoms, medication</h2></div><span class="pill">Daily log</span></div>
+        <div class="form-grid three">
+          <label>Systolic BP<input id="vSys" type="number" placeholder="120" /></label><label>Diastolic BP<input id="vDia" type="number" placeholder="80" /></label><label>Pulse<input id="vPulse" type="number" placeholder="72" /></label>
+          <label>Fasting glucose<input id="vGlucose" type="number" placeholder="mg/dL" /></label><label>Weight<input id="vWeight" type="number" placeholder="kg" /></label><label>Sleep hours<input id="vSleep" type="number" step="0.5" placeholder="7" /></label>
+          <label>Steps<input id="vSteps" type="number" placeholder="5000" /></label><label>Pain level 0-10<input id="vPain" type="number" min="0" max="10" placeholder="0" /></label><label>Mood<select id="vMood"><option>Good</option><option>Okay</option><option>Low</option><option>Anxious</option><option>Tired</option></select></label>
+          <label>Medicine taken?<select id="vMeds"><option>Yes</option><option>No</option><option>Partial</option></select></label><label>Bowel movement?<select id="vBowel"><option>Normal</option><option>Constipation</option><option>Loose motion</option><option>Not today</option></select></label><label>Water glasses<input id="vWater" type="number" placeholder="6" /></label>
+          <label class="wide">Symptoms / notes<textarea id="vNotes" placeholder="Dizziness, swelling, appetite, energy, doctor note..."></textarea></label>
+        </div>
+        <button onclick="saveVitals()" class="primary full">Save daily health check</button>
+      </article>
+      <article class="card"><h2>Recent Health Checks</h2><div id="vitalList"></div></article>
+    </section>
+
+    <section id="reports" class="tab-panel hidden">
+      <article class="card">
+        <div class="row-between"><div><p class="eyebrow">Health records</p><h2>Upload or scan reports</h2></div><span class="pill">PDF / image</span></div>
+        <p class="muted">Upload report files for storage, then manually enter key lab values so trends and safety notes work reliably.</p>
+        <div class="form-grid"><label>Report type<select id="reportType"><option>Blood test</option><option>Diabetes report</option><option>BP/Cardio report</option><option>Kidney report</option><option>Thyroid report</option><option>Prescription</option><option>Other</option></select></label><label>Report date<input id="reportDate" type="date" /></label><label>Upload file<input id="reportFile" type="file" accept=".pdf,image/*" onchange="previewReportFile('reportFile')" /></label><label>Scan with camera<input id="cameraFile" type="file" accept="image/*" capture="environment" onchange="previewReportFile('cameraFile')" /></label><label class="wide">Report notes<textarea id="reportNotes" placeholder="Summary, doctor comment, next appointment"></textarea></label></div>
+        <div id="reportPreview" class="report-preview"><div class="empty-state">Choose a file or scan using phone camera to preview it here.</div></div>
+        <button onclick="saveReport()" class="primary full">Save report</button>
+      </article>
+      <article class="card"><div class="row-between"><h2>Manual Lab Values</h2><span class="pill">Trend ready</span></div><div id="labInputs" class="form-grid three"></div><button onclick="saveLabs()" class="primary full">Save lab values</button></article>
+      <div class="two-column"><article class="card"><h2>Report History</h2><div id="reportList"></div></article><article class="card"><h2>Lab History</h2><div id="labList"></div></article></div>
+      <article class="card doctor-questions-card"><div class="row-between"><div><p class="eyebrow">Doctor visit preparation</p><h2>Questions to Ask</h2></div><button class="secondary" onclick="buildDoctorQuestions()">Refresh questions</button></div><ol id="doctorQuestions" class="doctor-questions"></ol></article>
+    </section>
+
+    <section id="exercise" class="tab-panel hidden">
+      <article class="card"><div class="row-between"><div><p class="eyebrow">Elder-safe movement</p><h2>Exercise Plan</h2></div><span class="pill">Stop for pain, dizziness, chest pain</span></div><div id="exercisePlan" class="exercise-grid"></div></article>
+      <article class="card"><h2>Log Exercise</h2><div class="form-grid three"><label>Exercise<select id="exSelect"></select></label><label>Minutes<input id="exMinutes" type="number" placeholder="15" /></label><label>Effort<select id="exEffort"><option>Easy</option><option>Moderate</option><option>Hard</option></select></label></div><button onclick="saveExercise()" class="primary full">Save exercise</button></article>
+      <article class="card"><h2>Exercise History</h2><div id="exerciseLog"></div></article>
+    </section>
+
+    <section id="care" class="tab-panel hidden">
+      <article class="card care-card"><div><p class="eyebrow">Caregiver summary</p><h2>Daily Care Plan</h2><p class="muted">A simple checklist for family members. Keep this practical and confirm clinical items with the doctor.</p></div><div id="carePlan" class="care-plan"></div></article>
+    </section>
+
+    <section id="ai" class="tab-panel hidden">
+      <article class="card ai-hero-card">
+        <div class="row-between">
+          <div>
+            <p class="eyebrow">AI wellness assistant</p>
+            <h2>Personalized Food, Exercise & Weight Suggestions</h2>
+            <p class="muted">Analyze profile, food logs, vitals, labs, exercise, and reports to create safe, practical next steps for the family.</p>
+          </div>
+          <span class="pill">General wellness only</span>
+        </div>
+        <div class="medical-banner compact">
+          AI guidance is not medical diagnosis. Do not use it to change medicines, ignore symptoms, or replace a doctor/registered dietitian.
+        </div>
+        <div class="form-grid three">
+          <label>Focus area
+            <select id="aiFocus">
+              <option value="complete">Complete daily review</option>
+              <option value="food">Food and nutrition</option>
+              <option value="exercise">Exercise and mobility</option>
+              <option value="weight">Weight goal</option>
+              <option value="elder-care">Elder care and safety</option>
+              <option value="labs">Lab report guidance</option>
+            </select>
+          </label>
+          <label>Family context / concern
+            <input id="aiConcern" placeholder="e.g. sugar high today, low protein, knee pain" />
+          </label>
+          <label>Preferred style
+            <select id="aiStyle">
+              <option value="simple">Simple and practical</option>
+              <option value="detailed">Detailed explanation</option>
+              <option value="caregiver">Caregiver checklist</option>
+            </select>
+          </label>
+        </div>
+        <button onclick="generateAISuggestions()" id="aiGenerateBtn" class="primary full">Generate AI Wellness Plan</button>
+      </article>
+
+      <article class="card">
+        <div class="row-between"><h2>AI Wellness Plan</h2><button class="ghost" onclick="clearAIPlan()">Clear</button></div>
+        <div id="aiStatus" class="muted">Click generate after saving profile and adding today’s food/vitals.</div>
+        <div id="aiOutput" class="ai-output"></div>
+      </article>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Mobile quick navigation">
+    <button class="active" data-tab="dashboard" onclick="showTab('dashboard')">🏠<span>Home</span></button>
+    <button data-tab="food" onclick="showTab('food')">🍽️<span>Food</span></button>
+    <button data-tab="ai" onclick="showTab('ai')">🎙️<span>AI</span></button>
+    <button data-tab="reports" onclick="showTab('reports')">📄<span>Reports</span></button>
+    <button data-tab="profile" onclick="showTab('profile')">👤<span>Profile</span></button>
+  </nav>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="./config.js"></script>
+  <script src="./data/foods.js"></script>
+  <script src="./data/exercises.js"></script>
+  <script src="./data/healthRules.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

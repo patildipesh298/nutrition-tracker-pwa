@@ -1,0 +1,12 @@
+window.EXERCISES = [
+ {name:'Easy walk', type:'Cardio', level:'Beginner', minutes:15, met:3.0, elderSafe:true, video:'https://www.youtube.com/results?search_query=15+minute+easy+walk+for+seniors', notes:'Flat surface, supportive shoes, stop if chest pain or dizziness.'},
+ {name:'Post-meal walk', type:'Cardio', level:'Beginner', minutes:10, met:2.8, elderSafe:true, video:'https://www.youtube.com/results?search_query=10+minute+walk+after+meal+for+seniors', notes:'Useful after meals if doctor allows; gentle pace.'},
+ {name:'Chair marching', type:'Chair exercise', level:'Beginner', minutes:10, met:2.0, elderSafe:true, video:'https://www.youtube.com/results?search_query=chair+marching+exercise+for+seniors', notes:'Seated option for low balance days.'},
+ {name:'Sit to stand', type:'Strength', level:'Beginner', minutes:8, met:2.5, elderSafe:true, video:'https://www.youtube.com/results?search_query=sit+to+stand+exercise+seniors', notes:'Use stable chair; keep knees aligned.'},
+ {name:'Wall push ups', type:'Strength', level:'Beginner', minutes:8, met:2.3, elderSafe:true, video:'https://www.youtube.com/results?search_query=wall+push+ups+for+seniors', notes:'Good upper body strength; avoid shoulder pain.'},
+ {name:'Heel raises', type:'Balance', level:'Beginner', minutes:6, met:2.0, elderSafe:true, video:'https://www.youtube.com/results?search_query=heel+raises+balance+exercise+seniors', notes:'Hold countertop/chair support.'},
+ {name:'Tandem balance practice', type:'Balance', level:'Beginner', minutes:5, met:1.8, elderSafe:true, video:'https://www.youtube.com/results?search_query=tandem+balance+exercise+for+seniors', notes:'Always stand near support.'},
+ {name:'Gentle yoga stretch', type:'Mobility', level:'Beginner', minutes:15, met:2.0, elderSafe:true, video:'https://www.youtube.com/results?search_query=gentle+yoga+for+seniors+beginner', notes:'Avoid painful ranges and floor poses if unsafe.'},
+ {name:'Breathing exercise', type:'Relaxation', level:'Beginner', minutes:5, met:1.2, elderSafe:true, video:'https://www.youtube.com/results?search_query=breathing+exercise+for+seniors', notes:'Slow breathing for relaxation; not a treatment.'},
+ {name:'Light dumbbell routine', type:'Strength', level:'Intermediate', minutes:20, met:3.5, elderSafe:false, video:'https://www.youtube.com/results?search_query=light+dumbbell+workout+for+seniors', notes:'Use only if cleared for resistance training.'}
+];
