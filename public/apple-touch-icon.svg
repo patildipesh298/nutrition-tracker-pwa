@@ -1,0 +1,35 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<title id="title">Eatlyte logo mark</title>
+<desc id="desc">A premium nutrition tracking logo combining a meal bowl, fork, progress ring, and balanced food accents.</desc>
+<defs>
+  <linearGradient id="bg" x1="132" y1="96" x2="892" y2="928" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#FFFDF8"/><stop offset="1" stop-color="#F8EFE3"/>
+  </linearGradient>
+  <linearGradient id="coral" x1="604" y1="158" x2="828" y2="382" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#FF7A5C"/><stop offset="1" stop-color="#E7563F"/>
+  </linearGradient>
+  <filter id="soft" x="88" y="78" width="848" height="872" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="28" stdDeviation="36" flood-color="#2A2018" flood-opacity="0.12"/></filter>
+</defs>
+<rect x="128" y="92" width="768" height="840" rx="198" fill="url(#bg)" filter="url(#soft)"/>
+<g transform="translate(132 96)">
+  <!-- progress plate ring -->
+  <path d="M588 154C496 94 365 96 262 164C132 251 92 427 174 561C256 696 428 747 566 676C683 616 744 488 717 362" stroke="#111318" stroke-width="68" stroke-linecap="round"/>
+  <path d="M612 154C690 170 752 220 790 286" stroke="url(#coral)" stroke-width="68" stroke-linecap="round"/>
+  <path d="M796 390C802 432 799 474 786 514" stroke="#111318" stroke-width="68" stroke-linecap="round"/>
+  <!-- fork tucked into ring -->
+  <path d="M760 350V505C760 553 722 592 674 594" stroke="#111318" stroke-width="24" stroke-linecap="round"/>
+  <path d="M724 350V438M760 350V438M796 350V438" stroke="#111318" stroke-width="22" stroke-linecap="round"/>
+  <!-- bowl / plate -->
+  <path d="M240 538C282 626 372 678 482 674C584 670 674 617 718 538H240Z" fill="#111318"/>
+  <path d="M247 539C350 572 558 572 711 539" stroke="white" stroke-width="18" stroke-linecap="round" opacity=".96"/>
+  <path d="M366 681H584" stroke="#111318" stroke-width="38" stroke-linecap="round"/>
+  <!-- food/macro accents -->
+  <path d="M304 508C335 455 382 446 434 492C406 532 358 538 304 508Z" fill="#E85D4A"/>
+  <path d="M472 508C492 447 548 423 610 456C592 522 530 548 472 508Z" fill="#D99A3F"/>
+  <path d="M458 480C437 422 456 370 514 338C538 400 514 454 458 480Z" fill="#111318"/>
+  <path d="M455 476C417 425 367 414 326 440C358 493 409 503 455 476Z" fill="#111318" opacity=".94"/>
+  <path d="M456 532C456 476 474 414 520 352" stroke="white" stroke-width="11" stroke-linecap="round" opacity=".9"/>
+  <!-- tracking ticks -->
+  <path d="M254 376H286M279 304L307 320M335 246L351 276M417 218V250" stroke="#111318" stroke-width="14" stroke-linecap="round" opacity=".85"/>
+</g>
+</svg>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://eatlyte.app/sitemap.xml

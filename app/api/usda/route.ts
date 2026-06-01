@@ -1,0 +1,2 @@
+import {NextRequest,NextResponse} from 'next/server';
+export async function GET(req:NextRequest){const q=req.nextUrl.searchParams.get('query')||'';const key=process.env.USDA_API_KEY;if(!key)return NextResponse.json({foods:[],warning:'USDA_API_KEY missing'});const r=await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(q)}&pageSize=8&api_key=${key}`);const d=await r.json();return NextResponse.json(d)}
