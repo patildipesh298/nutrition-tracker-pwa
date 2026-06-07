@@ -175,6 +175,19 @@ export default function ReportsClient() {
   const carbs = daily.map((d) => Math.round(d.c || 0));
   const fats = daily.map((d) => Math.round(d.f || 0));
   const water = daily.map((d) => Number(d.water || 0));
+  const potassiumSeries = daily.map((d) => Math.round(d.potassium || 0));
+  const calciumSeries = daily.map((d) => Math.round(d.calcium || 0));
+  const ironSeries = daily.map((d) => Math.round((d.iron || 0) * 10) / 10);
+  const avg7 = (arr: number[]) => Math.round((arr.reduce((a, x) => a + x, 0) / Math.max(arr.length, 1)) * 10) / 10;
+  const microTracked = meals.some(
+    (m) => m.potassium != null || m.calcium != null || m.iron != null || m.vitaminA != null || m.vitaminC != null,
+  );
+  const microAdequacy = [
+    { label: "Calcium", icon: "🥛", avg: avg7(calciumSeries), target: t.calcium, unit: "mg" },
+    { label: "Iron", icon: "🥬", avg: avg7(ironSeries), target: t.iron, unit: "mg" },
+    { label: "Potassium", icon: "🍌", avg: avg7(potassiumSeries), target: t.potassium, unit: "mg" },
+    { label: "Vitamin C", icon: "🍊", avg: avg7(daily.map((d) => Math.round(d.vitaminC || 0))), target: t.vitaminC, unit: "mg" },
+  ];
   const totalConsumed = consumed.reduce((a, x) => a + x, 0);
   const totalBurned = burned.reduce((a, x) => a + x, 0);
   const avgCalories = Math.round(totalConsumed / 7);
@@ -270,6 +283,50 @@ export default function ReportsClient() {
           <span>
             Calories today <b>{pct(todayTotals.cal || 0, t.calories)}%</b>
           </span>
+        </div>
+      </section>
+
+      <section className="card p-5 mb-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="eyebrow">Micronutrient adequacy</p>
+            <h2 className="section-title mt-1">7-day calcium, iron & potassium</h2>
+          </div>
+          <span className={`nutri-tag ${microTracked ? "tracked" : "estimate"}`}>{microTracked ? "tracked" : "est."}</span>
+        </div>
+        <div className="mt-4 grid gap-3">
+          {microAdequacy.map((m) => {
+            const fill = pct(m.avg, m.target);
+            const tone = fill >= 80 ? "good" : fill >= 50 ? "ok" : "low";
+            return (
+              <div className="adequacy-row" key={m.label}>
+                <span className="adequacy-icon" aria-hidden="true">{m.icon}</span>
+                <div className="adequacy-body">
+                  <div className="adequacy-top">
+                    <b>{m.label}</b>
+                    <strong>{Math.round(m.avg)}<small>/{Math.round(m.target)}{m.unit} avg</small></strong>
+                  </div>
+                  <i className="adequacy-meter"><em className={tone} style={{ width: `${fill}%` }} /></i>
+                  <small>{fill}% of daily target</small>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <p className="micro mt-3">
+          {microTracked
+            ? "Averaged from the verified foods you logged this week. Search foods from the Eatlyte/USDA database to keep micronutrient tracking accurate."
+            : "Log foods from the Eatlyte search/database (not just custom entries) to track real calcium, iron, potassium and vitamins here. Targets are general adult references, not medical advice."}
+        </p>
+      </section>
+
+      <section className="card p-5 mb-5">
+        <p className="eyebrow">Potassium trend</p>
+        <h2 className="section-title mt-1">7-day potassium intake</h2>
+        <BarChart series={[potassiumSeries]} labels={labels} />
+        <div className="progress-targets">
+          <span>7-day avg <b>{avg7(potassiumSeries)} mg</b></span>
+          <span>Target <b>{Math.round(t.potassium)} mg/day</b></span>
         </div>
       </section>
 

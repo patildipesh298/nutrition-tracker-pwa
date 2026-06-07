@@ -272,6 +272,24 @@ export default function ClientDashboard() {
   const moveMinutes = dayExercises.reduce((a, x) => a + (x.minutes || 0), 0);
   const moveCalories = dayExercises.reduce((a, x) => a + (x.calories || 0), 0);
   const mealSlotsLogged = new Set(dayMeals.map((m) => m.meal)).size;
+  // "Focus nutrients today": rank by how far below target. Macros (protein/fiber) are always
+  // tracked; micronutrients are only ranked when at least one logged food actually carries them,
+  // so we never shame a 0 that simply was not recorded.
+  const microCovered = (key: "potassium" | "calcium" | "iron" | "vitaminC") =>
+    dayMeals.some((m) => (m as any)[key] !== undefined && (m as any)[key] !== null);
+  const focusCandidates = [
+    { key: "protein", label: "Protein", icon: "🍗", value: totals.p, target: t.protein, unit: "g", tip: "Add dal, eggs, paneer, curd or chicken.", tracked: true },
+    { key: "fiber", label: "Fiber", icon: "🌾", value: totals.fiber, target: t.fiber, unit: "g", tip: "Add salad, fruit, beans or oats.", tracked: true },
+    { key: "potassium", label: "Potassium", icon: "🍌", value: totals.potassium, target: t.potassium, unit: "mg", tip: "Banana, spinach, beans and curd help.", tracked: microCovered("potassium") },
+    { key: "calcium", label: "Calcium", icon: "🥛", value: totals.calcium, target: t.calcium, unit: "mg", tip: "Milk, curd, paneer, tofu or ragi.", tracked: microCovered("calcium") },
+    { key: "iron", label: "Iron", icon: "🥬", value: totals.iron, target: t.iron, unit: "mg", tip: "Spinach, dal, jaggery and sprouts.", tracked: microCovered("iron") },
+    { key: "vitaminC", label: "Vitamin C", icon: "🍊", value: totals.vitaminC, target: t.vitaminC, unit: "mg", tip: "Citrus, guava, amla or peppers.", tracked: microCovered("vitaminC") },
+  ];
+  const focusNutrients = focusCandidates
+    .filter((x) => x.tracked)
+    .map((x) => ({ ...x, fill: pct(x.value, x.target) }))
+    .sort((a, b) => a.fill - b.fill)
+    .slice(0, 3);
   const activeDays = trends.days.filter((d: any) => d.move > 0).length;
   const selectedLabel = prettyDate(selectedDate);
   const bmi =
@@ -582,6 +600,36 @@ export default function ClientDashboard() {
                 <span>sugar used</span>
               </div>
             </div>
+          </div>
+          <div className="card p-5 focus-nutrient-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="eyebrow">Focus today</p>
+                <h2 className="section-title mt-1">Top 3 to improve</h2>
+              </div>
+              <Sparkles size={20} className="text-amber-500" />
+            </div>
+            {dayMeals.length && focusNutrients.length ? (
+              <div className="mt-4 grid gap-3">
+                {focusNutrients.map((n) => (
+                  <div className="focus-nutrient-row" key={n.key}>
+                    <span className="focus-nutrient-icon" aria-hidden="true">{n.icon}</span>
+                    <div className="focus-nutrient-body">
+                      <div className="focus-nutrient-top">
+                        <b>{n.label}</b>
+                        <strong>{Math.round(n.value)}<small>/{Math.round(n.target)}{n.unit}</small></strong>
+                      </div>
+                      <i className="focus-nutrient-meter"><em style={{ width: `${n.fill}%` }} /></i>
+                      <small>{n.fill}% of target · {n.tip}</small>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="micro mt-3">
+                Log a few foods to see which nutrients to focus on. Search foods from the Eatlyte database to track potassium, calcium, iron and vitamins automatically.
+              </p>
+            )}
           </div>
           <div className="bmi-card card p-5">
             <div className="flex items-center justify-between">

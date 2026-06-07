@@ -33,6 +33,11 @@ function scaleFood(f: any, amount: number, unit: string, meal: string, date: str
   const base = parseServing(f.serving);
   const normalizedAmount = Number.isFinite(amount) && amount > 0 ? amount : 1;
   const factor = unit === 'serving' ? normalizedAmount : normalizedAmount / (base.amount || 100);
+  // Scale a micronutrient only when the source food actually carries it, so we never invent values.
+  const micro = (key: string, decimals = 0) =>
+    f?.[key] === undefined || f?.[key] === null || f?.[key] === ''
+      ? undefined
+      : +((Number(f[key]) || 0) * factor).toFixed(decimals);
   return {
     id: id(),
     date,
@@ -46,6 +51,11 @@ function scaleFood(f: any, amount: number, unit: string, meal: string, date: str
     fiber: +((f.fiber || 0) * factor).toFixed(1),
     sugar: +((f.sugar || 0) * factor).toFixed(1),
     sodium: Math.round((f.sodium || 0) * factor),
+    potassium: micro('potassium'),
+    calcium: micro('calcium'),
+    iron: micro('iron', 1),
+    vitaminA: micro('vitaminA', 1),
+    vitaminC: micro('vitaminC', 1),
     source: f.source || 'Food database',
   };
 }
@@ -115,7 +125,8 @@ export default function FoodClient() {
   const [photoStatus, setPhotoStatus] = useState('Upload a clear meal photo. Review estimates before saving.');
   const [labelScan, setLabelScan] = useState<any>(null);
   const [labelStatus, setLabelStatus] = useState('Upload a clear nutrition facts label. We will extract serving size and nutrients.');
-  const [manual, setManual] = useState({ name: '', cal: '', p: '', c: '', f: '', fiber: '', sugar: '', sodium: '', qty: '100', unit: 'g' });
+  const [manual, setManual] = useState({ name: '', cal: '', p: '', c: '', f: '', fiber: '', sugar: '', sodium: '', potassium: '', calcium: '', iron: '', vitaminA: '', vitaminC: '', qty: '100', unit: 'g' });
+  const [showManualMicros, setShowManualMicros] = useState(false);
   const [listening, setListening] = useState(false);
   const [micSupported, setMicSupported] = useState(true);
   const [photoPreview, setPhotoPreview] = useState('');
@@ -374,6 +385,11 @@ export default function FoodClient() {
       fiber: +labelScan.fiber || 0,
       sugar: +labelScan.sugar || 0,
       sodium: +labelScan.sodium || 0,
+      potassium: labelScan.potassium ?? '',
+      calcium: labelScan.calcium ?? '',
+      iron: labelScan.iron ?? '',
+      vitaminA: labelScan.vitaminA ?? '',
+      vitaminC: labelScan.vitaminC ?? '',
       source: 'Nutrition label',
     };
     const log = scaleFood(base, 1, 'serving', meal, selectedDate);
@@ -383,10 +399,11 @@ export default function FoodClient() {
 
   function addManual() {
     if (!manual.name.trim()) return toast('Enter food name');
-    const base = { name: manual.name, serving: `${manual.qty}${manual.unit}`, cal: +manual.cal || 0, p: +manual.p || 0, c: +manual.c || 0, f: +manual.f || 0, fiber: +manual.fiber || 0, sugar: +manual.sugar || 0, sodium: +manual.sodium || 0, source: 'Custom' };
+    // Pass micronutrients as raw strings: scaleFood treats '' as "not provided" so we never store a fake 0.
+    const base = { name: manual.name, serving: `${manual.qty}${manual.unit}`, cal: +manual.cal || 0, p: +manual.p || 0, c: +manual.c || 0, f: +manual.f || 0, fiber: +manual.fiber || 0, sugar: +manual.sugar || 0, sodium: +manual.sodium || 0, potassium: manual.potassium, calcium: manual.calcium, iron: manual.iron, vitaminA: manual.vitaminA, vitaminC: manual.vitaminC, source: 'Custom' };
     const log = scaleFood(base, +manual.qty || 100, manual.unit, meal, selectedDate);
     persistAndSave(log, 'Custom food added');
-    setManual({ name: '', cal: '', p: '', c: '', f: '', fiber: '', sugar: '', sodium: '', qty: '100', unit: 'g' });
+    setManual({ name: '', cal: '', p: '', c: '', f: '', fiber: '', sugar: '', sodium: '', potassium: '', calcium: '', iron: '', vitaminA: '', vitaminC: '', qty: '100', unit: 'g' });
 
   }
 
@@ -449,8 +466,17 @@ export default function FoodClient() {
         <input className="input" type="number" placeholder="Fiber g" value={manual.fiber} onChange={(e) => setManual({ ...manual, fiber: e.target.value })} />
         <input className="input" type="number" placeholder="Sugar g" value={manual.sugar} onChange={(e) => setManual({ ...manual, sugar: e.target.value })} />
         <input className="input" type="number" placeholder="Sodium mg" value={manual.sodium} onChange={(e) => setManual({ ...manual, sodium: e.target.value })} />
-        <button className="btn btn-primary" onClick={addManual}>Add custom food</button>
       </div>
+      <button type="button" className="btn btn-ghost mt-3 !py-2" onClick={() => setShowManualMicros((v) => !v)}>{showManualMicros ? 'Hide micronutrients' : '+ Add micronutrients (optional)'}</button>
+      {showManualMicros && <div className="mt-2 grid gap-2 sm:grid-cols-5">
+        <input className="input" type="number" placeholder="Potassium mg" value={manual.potassium} onChange={(e) => setManual({ ...manual, potassium: e.target.value })} />
+        <input className="input" type="number" placeholder="Calcium mg" value={manual.calcium} onChange={(e) => setManual({ ...manual, calcium: e.target.value })} />
+        <input className="input" type="number" placeholder="Iron mg" value={manual.iron} onChange={(e) => setManual({ ...manual, iron: e.target.value })} />
+        <input className="input" type="number" placeholder="Vitamin A µg" value={manual.vitaminA} onChange={(e) => setManual({ ...manual, vitaminA: e.target.value })} />
+        <input className="input" type="number" placeholder="Vitamin C mg" value={manual.vitaminC} onChange={(e) => setManual({ ...manual, vitaminC: e.target.value })} />
+      </div>}
+      <p className="micro mt-2">Micronutrients are optional. Leave blank if unknown — Eatlyte will show them as estimates rather than guessing exact values.</p>
+      <button className="btn btn-primary mt-3 w-full" onClick={addManual}>Add custom food</button>
     </section>}
 
     {mode === 'describe' && <section className="card mb-4 p-5">
@@ -515,7 +541,7 @@ export default function FoodClient() {
       <h2 className="section-title">Nutrition label entry</h2>
       <p className="micro mt-1">Use barcode lookup first. If barcode data is missing, enter label values here manually.</p>
       <div className="mt-4 rounded-3xl border border-blue-100 bg-gradient-to-br from-white to-blue-50 p-4">
-        <div className="grid gap-2 sm:grid-cols-2"><input className="input sm:col-span-2" placeholder="Food name" value={labelScan?.name || ''} onChange={(e) => updateLabelField('name', e.target.value)} /><input className="input sm:col-span-2" placeholder="Serving size, e.g. 30g or 1 pack" value={labelScan?.serving || ''} onChange={(e) => updateLabelField('serving', e.target.value)} /><input className="input" placeholder="Calories" value={labelScan?.cal || labelScan?.calories || ''} onChange={(e) => updateLabelField('cal', e.target.value)} /><input className="input" placeholder="Protein g" value={labelScan?.p || labelScan?.protein || ''} onChange={(e) => updateLabelField('p', e.target.value)} /><input className="input" placeholder="Carbs g" value={labelScan?.c || labelScan?.carbs || ''} onChange={(e) => updateLabelField('c', e.target.value)} /><input className="input" placeholder="Fat g" value={labelScan?.f || labelScan?.fat || ''} onChange={(e) => updateLabelField('f', e.target.value)} /><input className="input" placeholder="Sugar g" value={labelScan?.sugar || ''} onChange={(e) => updateLabelField('sugar', e.target.value)} /><input className="input" placeholder="Sodium mg" value={labelScan?.sodium || ''} onChange={(e) => updateLabelField('sodium', e.target.value)} /></div>
+        <div className="grid gap-2 sm:grid-cols-2"><input className="input sm:col-span-2" placeholder="Food name" value={labelScan?.name || ''} onChange={(e) => updateLabelField('name', e.target.value)} /><input className="input sm:col-span-2" placeholder="Serving size, e.g. 30g or 1 pack" value={labelScan?.serving || ''} onChange={(e) => updateLabelField('serving', e.target.value)} /><input className="input" placeholder="Calories" value={labelScan?.cal || labelScan?.calories || ''} onChange={(e) => updateLabelField('cal', e.target.value)} /><input className="input" placeholder="Protein g" value={labelScan?.p || labelScan?.protein || ''} onChange={(e) => updateLabelField('p', e.target.value)} /><input className="input" placeholder="Carbs g" value={labelScan?.c || labelScan?.carbs || ''} onChange={(e) => updateLabelField('c', e.target.value)} /><input className="input" placeholder="Fat g" value={labelScan?.f || labelScan?.fat || ''} onChange={(e) => updateLabelField('f', e.target.value)} /><input className="input" placeholder="Sugar g" value={labelScan?.sugar || ''} onChange={(e) => updateLabelField('sugar', e.target.value)} /><input className="input" placeholder="Sodium mg" value={labelScan?.sodium || ''} onChange={(e) => updateLabelField('sodium', e.target.value)} /><input className="input" placeholder="Potassium mg (optional)" value={labelScan?.potassium || ''} onChange={(e) => updateLabelField('potassium', e.target.value)} /><input className="input" placeholder="Calcium mg (optional)" value={labelScan?.calcium || ''} onChange={(e) => updateLabelField('calcium', e.target.value)} /><input className="input" placeholder="Iron mg (optional)" value={labelScan?.iron || ''} onChange={(e) => updateLabelField('iron', e.target.value)} /><input className="input" placeholder="Vitamin C mg (optional)" value={labelScan?.vitaminC || ''} onChange={(e) => updateLabelField('vitaminC', e.target.value)} /></div>
         <button className="btn btn-primary mt-3 w-full" onClick={saveLabelFood}>Save label food</button>
       </div>
     </section>}

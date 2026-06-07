@@ -16,6 +16,8 @@ type FoodResult = {
   potassium?: number;
   calcium?: number;
   iron?: number;
+  vitaminA?: number;
+  vitaminC?: number;
   source: string;
   tags?: string[];
   quality?: 'verified' | 'label' | 'estimate';
@@ -53,11 +55,13 @@ async function usdaResults(query: string, apiKey?: string): Promise<FoodResult[]
   const response = await fetch(url, { signal: timeoutSignal(), next: { revalidate: 60 * 60 * 24 * 7 } });
   if (!response.ok) return [];
   const data = await response.json();
-  return (data.foods || []).slice(0, 10).map((food: any) => ({ name: food.description || 'Food item', brand: food.brandOwner || food.brandName || '', group: food.foodCategory || 'USDA verified food data', serving: '100g', cal: nutrientFromUsda(food, [1008, 2047, 2048]), p: nutrientFromUsda(food, [1003]), c: nutrientFromUsda(food, [1005]), f: nutrientFromUsda(food, [1004]), fiber: nutrientFromUsda(food, [1079]), sugar: nutrientFromUsda(food, [2000, 1063]), sodium: nutrientFromUsda(food, [1093]), potassium: nutrientFromUsda(food, [1092]), calcium: nutrientFromUsda(food, [1087]), iron: nutrientFromUsda(food, [1089]), source: 'USDA FoodData Central', tags: ['verified', 'usda', 'nutrition'], quality: 'verified' }));
+  return (data.foods || []).slice(0, 10).map((food: any) => ({ name: food.description || 'Food item', brand: food.brandOwner || food.brandName || '', group: food.foodCategory || 'USDA verified food data', serving: '100g', cal: nutrientFromUsda(food, [1008, 2047, 2048]), p: nutrientFromUsda(food, [1003]), c: nutrientFromUsda(food, [1005]), f: nutrientFromUsda(food, [1004]), fiber: nutrientFromUsda(food, [1079]), sugar: nutrientFromUsda(food, [2000, 1063]), sodium: nutrientFromUsda(food, [1093]), potassium: nutrientFromUsda(food, [1092]), calcium: nutrientFromUsda(food, [1087]), iron: nutrientFromUsda(food, [1089]), vitaminA: nutrientFromUsda(food, [1106]), vitaminC: nutrientFromUsda(food, [1162]), source: 'USDA FoodData Central', tags: ['verified', 'usda', 'nutrition'], quality: 'verified' }));
 }
 function normalizeOpenFoodFactsProduct(product: any): FoodResult {
   const n = product?.nutriments || {}; const sodium = n.sodium_serving ?? n.sodium_100g;
-  return { name: product?.product_name || product?.generic_name || 'Packaged food', brand: product?.brands || '', group: product?.categories_tags?.[0]?.replace('en:', '') || 'Packaged food', serving: product?.serving_size || '100g', cal: num(n['energy-kcal_serving'] ?? n['energy-kcal_100g']), p: num(n.proteins_serving ?? n.proteins_100g), c: num(n.carbohydrates_serving ?? n.carbohydrates_100g), f: num(n.fat_serving ?? n.fat_100g), fiber: num(n.fiber_serving ?? n.fiber_100g), sugar: num(n.sugars_serving ?? n.sugars_100g), sodium: num(sodium) * 1000, source: 'Open Food Facts packaged foods', tags: ['packaged', 'barcode', product?.nutriscore_grade ? `nutri-score-${product.nutriscore_grade}` : ''].filter(Boolean), quality: 'label' };
+  // Open Food Facts stores minerals in grams; convert to mg/µg to match our internal units.
+  const mineralMg = (serv: unknown, base: unknown) => { const v = serv ?? base; return v == null ? undefined : num(v) * 1000; };
+  return { name: product?.product_name || product?.generic_name || 'Packaged food', brand: product?.brands || '', group: product?.categories_tags?.[0]?.replace('en:', '') || 'Packaged food', serving: product?.serving_size || '100g', cal: num(n['energy-kcal_serving'] ?? n['energy-kcal_100g']), p: num(n.proteins_serving ?? n.proteins_100g), c: num(n.carbohydrates_serving ?? n.carbohydrates_100g), f: num(n.fat_serving ?? n.fat_100g), fiber: num(n.fiber_serving ?? n.fiber_100g), sugar: num(n.sugars_serving ?? n.sugars_100g), sodium: num(sodium) * 1000, potassium: mineralMg(n.potassium_serving, n.potassium_100g), calcium: mineralMg(n.calcium_serving, n.calcium_100g), iron: mineralMg(n.iron_serving, n.iron_100g), vitaminC: mineralMg(n['vitamin-c_serving'], n['vitamin-c_100g']), vitaminA: (n['vitamin-a_serving'] ?? n['vitamin-a_100g']) == null ? undefined : num(n['vitamin-a_serving'] ?? n['vitamin-a_100g']) * 1_000_000, source: 'Open Food Facts packaged foods', tags: ['packaged', 'barcode', product?.nutriscore_grade ? `nutri-score-${product.nutriscore_grade}` : ''].filter(Boolean), quality: 'label' };
 }
 async function openFoodFactsResults(query: string): Promise<FoodResult[]> {
   const url = new URL('https://world.openfoodfacts.org/cgi/search.pl');

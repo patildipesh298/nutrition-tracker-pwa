@@ -32,11 +32,20 @@ export async function POST(req: NextRequest) {
     const email = String(body.email || '').trim().toLowerCase();
     const name = String(body.name || '').trim();
     const role = (String(body.role || 'member').toLowerCase() in roleConfig ? String(body.role || 'member').toLowerCase() : 'member') as FamilyRole;
-    const token = String(body.token || makeToken('invite'));
-    const expiresAt = String(body.expiresAt || daysFromNow(7));
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://eatlyte.app';
-    const inviteUrl = String(body.inviteUrl || `${baseUrl}/accept-invite?token=${encodeURIComponent(token)}&role=${role}&email=${encodeURIComponent(email)}`);
+    // Only accept a well-formed client token (makeToken output); otherwise generate one server-side.
+    const rawToken = String(body.token || '');
+    const token = /^[a-z]+_[a-z0-9]{8,}$/i.test(rawToken) ? rawToken : makeToken('invite');
+    // Cap the lifetime server-side so a client cannot mint a years-long invite.
+    const requestedExpiry = body.expiresAt ? new Date(String(body.expiresAt)).getTime() : NaN;
+    const maxExpiry = Date.now() + 14 * 24 * 60 * 60 * 1000;
+    const expiresAt = Number.isFinite(requestedExpiry) && requestedExpiry > Date.now() && requestedExpiry <= maxExpiry
+      ? new Date(requestedExpiry).toISOString()
+      : daysFromNow(7);
     if (!email || !isEmail(email)) return NextResponse.json({ success: false, error: 'Please enter a valid email address.' }, { status: 400 });
+    // Always build the invite link server-side from a trusted base URL. Never email a client-supplied
+    // URL — that would let a caller turn Eatlyte's mailer into a phishing relay.
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://eatlyte.app';
+    const inviteUrl = `${baseUrl.replace(/\/$/, '')}/accept-invite?token=${encodeURIComponent(token)}&role=${role}&email=${encodeURIComponent(email)}`;
 
     let inviteId = token;
     const admin = getSupabaseAdmin();

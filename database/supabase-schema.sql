@@ -40,8 +40,20 @@ create table if not exists public.food_logs (
   fiber_g numeric default 0,
   sugar_g numeric default 0,
   sodium_mg numeric default 0,
+  potassium_mg numeric,
+  calcium_mg numeric,
+  iron_mg numeric,
+  vitamin_a_mcg numeric,
+  vitamin_c_mg numeric,
   created_at timestamptz default now()
 );
+-- Micronutrient columns are nullable (not default 0) so the app can tell the difference
+-- between "0 logged" and "this food source did not provide the value".
+alter table public.food_logs add column if not exists potassium_mg numeric;
+alter table public.food_logs add column if not exists calcium_mg numeric;
+alter table public.food_logs add column if not exists iron_mg numeric;
+alter table public.food_logs add column if not exists vitamin_a_mcg numeric;
+alter table public.food_logs add column if not exists vitamin_c_mg numeric;
 
 create table if not exists public.vital_logs (
   id uuid primary key default uuid_generate_v4(),

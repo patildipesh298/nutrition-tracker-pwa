@@ -95,6 +95,11 @@ export function rowToMeal(row: any): MealLog {
     fiber: Number(row.fiber_g || 0),
     sugar: Number(row.sugar_g || 0),
     sodium: Number(row.sodium_mg || 0),
+    potassium: row.potassium_mg == null ? undefined : Number(row.potassium_mg),
+    calcium: row.calcium_mg == null ? undefined : Number(row.calcium_mg),
+    iron: row.iron_mg == null ? undefined : Number(row.iron_mg),
+    vitaminA: row.vitamin_a_mcg == null ? undefined : Number(row.vitamin_a_mcg),
+    vitaminC: row.vitamin_c_mg == null ? undefined : Number(row.vitamin_c_mg),
     source: row.source || 'Supabase',
   };
 }
@@ -114,6 +119,11 @@ function mealToRow(userId: string, log: MealLog) {
     fiber_g: log.fiber,
     sugar_g: log.sugar,
     sodium_mg: log.sodium,
+    potassium_mg: log.potassium ?? null,
+    calcium_mg: log.calcium ?? null,
+    iron_mg: log.iron ?? null,
+    vitamin_a_mcg: log.vitaminA ?? null,
+    vitamin_c_mg: log.vitaminC ?? null,
     source: log.source || 'App',
   };
 }

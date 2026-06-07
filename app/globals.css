@@ -574,6 +574,33 @@ body{background:linear-gradient(180deg,#fff 0%,#fbfaf8 42%,#f8f7f9 100%)!importa
 .nutrition-fact-meter{grid-column:1/-1;height:7px;background:var(--nf-surface-2);border-radius:999px;overflow:hidden;}
 .nutrition-fact-meter i{display:block;height:100%;border-radius:999px;background:var(--nf-water);}
 .nutrition-fact-meter i.red{background:var(--nf-protein);}.nutrition-fact-meter i.orange{background:var(--nf-carbs);}.nutrition-fact-meter i.green{background:var(--nf-good);}.nutrition-fact-meter i.blue{background:var(--nf-fat);}
+.nutri-tag{font-size:10px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:middle;}
+.nutri-tag.tracked{background:#e7f6ee;color:#1f8a54;}
+.nutri-tag.estimate{background:#fff3e0;color:#b7791f;}
+.nutri-target{font-style:normal;font-size:12px;font-weight:800;color:var(--nf-muted);margin-left:2px;}
+.focus-nutrient-row{display:flex;gap:12px;align-items:flex-start;}
+.focus-nutrient-icon{font-size:22px;line-height:1.2;flex:0 0 auto;}
+.focus-nutrient-body{flex:1;min-width:0;}
+.focus-nutrient-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.focus-nutrient-top b{font-size:15px;font-weight:900;color:var(--nf-heading);}
+.focus-nutrient-top strong{font-size:15px;font-weight:950;color:var(--nf-heading);}
+.focus-nutrient-top small{font-size:12px;font-weight:800;color:var(--nf-muted);}
+.focus-nutrient-meter{display:block;height:7px;border-radius:999px;background:var(--nf-surface-2);overflow:hidden;margin:6px 0 4px;}
+.focus-nutrient-meter em{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#e8915d,#d99a3f);}
+.focus-nutrient-body small{display:block;font-size:11.5px;font-weight:700;color:var(--nf-muted);}
+.adequacy-row{display:flex;gap:12px;align-items:flex-start;}
+.adequacy-icon{font-size:22px;flex:0 0 auto;}
+.adequacy-body{flex:1;min-width:0;}
+.adequacy-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.adequacy-top b{font-size:15px;font-weight:900;color:var(--nf-heading);}
+.adequacy-top strong{font-size:15px;font-weight:950;color:var(--nf-heading);}
+.adequacy-top small{font-size:12px;font-weight:800;color:var(--nf-muted);}
+.adequacy-meter{display:block;height:8px;border-radius:999px;background:var(--nf-surface-2);overflow:hidden;margin:6px 0 4px;}
+.adequacy-meter em{display:block;height:100%;border-radius:999px;background:var(--nf-water);}
+.adequacy-meter em.good{background:var(--nf-good);}
+.adequacy-meter em.ok{background:var(--nf-carbs);}
+.adequacy-meter em.low{background:var(--nf-protein);}
+.adequacy-body small{display:block;font-size:11.5px;font-weight:700;color:var(--nf-muted);}
 .bmi-card h2{font-size:44px!important;line-height:.95;font-weight:950;letter-spacing:-.08em;color:var(--nf-heading);}
 .bmi-card h2 span{font-size:14px;letter-spacing:0;background:#fff7e5;color:#b7791f;border-radius:999px;padding:8px 10px;vertical-align:middle;margin-left:6px;}
 .bmi-scale{position:relative;height:16px;border-radius:999px;margin-top:22px;background:linear-gradient(90deg,#6ca4e8 0 25%,#2db582 25% 50%,#f2c86b 50% 75%,#e85d75 75% 100%);}
