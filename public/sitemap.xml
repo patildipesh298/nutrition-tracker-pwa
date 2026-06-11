@@ -2,4 +2,8 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://eatlyte.app/</loc></url>
   <url><loc>https://eatlyte.app/login</loc></url>
+  <url><loc>https://eatlyte.app/privacy</loc></url>
+  <url><loc>https://eatlyte.app/terms</loc></url>
+  <url><loc>https://eatlyte.app/disclaimer</loc></url>
+  <url><loc>https://eatlyte.app/support</loc></url>
 </urlset>
