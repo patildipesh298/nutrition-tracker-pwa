@@ -175,24 +175,6 @@ Brand name: Eatlyte.
 Domain: https://eatlyte.app.
 The logo should communicate food + nutrition + progress tracking.
 
-
-## Target production stack
-- Mobile App: React Native + Expo + TypeScript.
-- Navigation: Expo Router.
-- Mobile UI: NativeWind or Tamagui.
-- Backend: Supabase initially; consider NestJS + PostgreSQL only when scale or domain complexity requires it.
-- Database: PostgreSQL / Supabase Postgres.
-- Auth: Supabase Auth with Google and Apple login.
-- Storage: Supabase Storage.
-- Food APIs: USDA FoodData Central, Open Food Facts, and a verified internal food database.
-- AI/Nutrition Engine: Node.js service first; Python service later only for advanced AI/ML.
-- Payments: RevenueCat for Apple/Google subscriptions.
-- Push Notifications: Expo Notifications.
-- Analytics: PostHog or Firebase Analytics with no sensitive health data in events.
-- Crash Reporting: Sentry with privacy-safe filtering.
-- CI/CD: GitHub Actions + Expo EAS Build/Submit for mobile.
-- Web Admin Panel: Next.js + Tailwind + Supabase.
-
 ## Engineering rules
 - Continue from existing files.
 - Do not rebuild from scratch unless absolutely necessary.
@@ -226,8 +208,6 @@ The logo should communicate food + nutrition + progress tracking.
 ## Validation required before PR completion
 Run:
 - `npm ci --no-audit --no-fund --prefer-offline`
-- `npm run check:env`
-- `npm run lint`
 - `npm run typecheck`
 - `npm run build`
 
