@@ -14,8 +14,10 @@ import {
   Lightbulb,
   LogOut,
   Mic,
+  Moon,
   Plus,
   Salad,
+  Sun,
   ScanBarcode,
   Search,
   UserRound,
@@ -155,6 +157,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [exerciseName, setExerciseName] = useState("Post-meal walk");
   const [vitalGlucose, setVitalGlucose] = useState("");
   const [vitalBp, setVitalBp] = useState("");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -170,9 +173,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }, [query]);
 
   useEffect(() => {
-    document.documentElement.dataset.theme = "light";
-    localStorage.removeItem("nf-theme");
+    const saved = readLS<"light" | "dark">("eatlyte-theme", "light");
+    const next = saved === "dark" ? "dark" : "light";
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
   }, []);
+
+  function toggleTheme() {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
+    writeLS("eatlyte-theme", next);
+  }
 
   useEffect(() => {
     const handler = (event: Event) => {
@@ -525,6 +537,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   </span>
                 </Link>
               ))}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="btn btn-ghost !py-2"
+                aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+              >
+                {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+                {theme === "dark" ? "Light" : "Dark"}
+              </button>
               <Link href="/profile" className="btn btn-ghost !py-2">
                 Profile
               </Link>
