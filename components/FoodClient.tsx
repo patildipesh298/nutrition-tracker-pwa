@@ -11,6 +11,7 @@ import { id, readLS, round, today, toast, writeLS } from '@/lib/storage';
 import { sumMeals } from '@/lib/nutrition';
 import { deleteMeal, fetchMealsForRange, fetchProfileStatus, insertMeal, defaultProfile } from '@/lib/supabaseData';
 import { foodSmartFlags, servingHint, smartMealSuggestion, movementFromFood } from '@/lib/wellnessInsights';
+import { Camera, MessageCircle, Pencil, ScanBarcode, Search, Tags } from 'lucide-react';
 
 type Food = typeof LOCAL_FOODS[number];
 type AddMode = 'search' | 'manual' | 'describe' | 'mealPhoto' | 'barcode' | 'label';
@@ -426,12 +427,12 @@ export default function FoodClient() {
         <p className="mt-2 text-xs font-bold text-slate-500">Movement idea: {movementSuggestion.text}</p>
       </div>
       <div className="quick-actions">
-        <button className={mode === 'describe' ? 'quick-action active' : 'quick-action'} onClick={() => setModeAndReset('describe')}>💬<span>Describe</span></button>
-        <button className={mode === 'search' ? 'quick-action active' : 'quick-action'} onClick={() => setModeAndReset('search')}>🔎<span>Search</span></button>
-        <button className={mode === 'mealPhoto' ? 'quick-action active' : 'quick-action'} onClick={() => setModeAndReset('mealPhoto')}>📷<span>Photo</span></button>
-        <button className={mode === 'barcode' ? 'quick-action active' : 'quick-action'} onClick={() => setModeAndReset('barcode')}>▦<span>Barcode</span></button>
-        <button className={mode === 'label' ? 'quick-action active' : 'quick-action'} onClick={() => setModeAndReset('label')}>🏷️<span>Label</span></button>
-        <button className={mode === 'manual' ? 'quick-action active' : 'quick-action'} onClick={() => setModeAndReset('manual')}>✍️<span>Custom</span></button>
+        <button className={mode === 'describe' ? 'quick-action active' : 'quick-action'} onClick={() => setModeAndReset('describe')}><MessageCircle size={22} /><span>Describe</span></button>
+        <button className={mode === 'search' ? 'quick-action active' : 'quick-action'} onClick={() => setModeAndReset('search')}><Search size={22} /><span>Search</span></button>
+        <button className={mode === 'mealPhoto' ? 'quick-action active' : 'quick-action'} onClick={() => setModeAndReset('mealPhoto')}><Camera size={22} /><span>Photo</span></button>
+        <button className={mode === 'barcode' ? 'quick-action active' : 'quick-action'} onClick={() => setModeAndReset('barcode')}><ScanBarcode size={22} /><span>Barcode</span></button>
+        <button className={mode === 'label' ? 'quick-action active' : 'quick-action'} onClick={() => setModeAndReset('label')}><Tags size={22} /><span>Label</span></button>
+        <button className={mode === 'manual' ? 'quick-action active' : 'quick-action'} onClick={() => setModeAndReset('manual')}><Pencil size={22} /><span>Custom</span></button>
       </div>
     </section>
 

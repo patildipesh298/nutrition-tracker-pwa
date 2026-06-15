@@ -52,7 +52,7 @@ export function todayQuests({
   return [
     {
       id: 'first-meal',
-      icon: '🍽️',
+      icon: 'Meal',
       title: meals.length ? 'Meal logged' : 'Log your first meal',
       description: meals.length
         ? `${meals.length} food item${meals.length > 1 ? 's' : ''} logged today.`
@@ -66,7 +66,7 @@ export function todayQuests({
     },
     {
       id: 'protein',
-      icon: '🍗',
+      icon: 'Protein',
       title: totals.p >= t.protein * 0.7 ? 'Protein is strong' : 'Protein helper',
       description: `${Math.round(totals.p)}g of ${Math.round(t.protein)}g. Add dal, eggs, yogurt, paneer, tofu, fish, or chicken if needed.`,
       cta: 'Find protein',
@@ -78,7 +78,7 @@ export function todayQuests({
     },
     {
       id: 'water',
-      icon: '💧',
+      icon: 'Water',
       title: water >= 6 ? 'Hydration hero' : 'Water check-in',
       description: `${water}/8 glasses logged. Small water check-ins keep the dashboard useful.`,
       cta: 'Add water',
@@ -90,7 +90,7 @@ export function todayQuests({
     },
     {
       id: 'movement',
-      icon: '🚶',
+      icon: 'Move',
       title: movement >= 20 ? 'Movement done' : 'Post-meal walk',
       description: `${movement} minutes logged. Even 10 minutes after meals can build consistency.`,
       cta: 'Log move',
@@ -102,7 +102,7 @@ export function todayQuests({
     },
     {
       id: 'fiber',
-      icon: '🥗',
+      icon: 'Fiber',
       title: totals.fiber >= fiberGoal ? 'Fiber win' : 'Fiber boost',
       description: `${Math.round(totals.fiber)}g fiber logged. Add vegetables, beans, oats, fruit, or millets.`,
       cta: 'Add fiber food',
@@ -114,7 +114,7 @@ export function todayQuests({
     },
     {
       id: 'meal-coverage',
-      icon: '🌙',
+      icon: 'Day',
       title: mealTypes >= 3 ? 'Day is well covered' : 'Complete the day',
       description: `${mealTypes}/4 meal categories logged. Keep it simple: breakfast, lunch, dinner, or snack.`,
       cta: 'Complete day',
@@ -155,12 +155,12 @@ export function achievementBadges({
   const waterDays = new Set(vitals.filter((v) => (v.water || 0) >= 6).map((v) => v.date)).size;
   const moveDays = new Set(exercises.filter((e) => (e.minutes || 0) >= 10).map((e) => e.date)).size;
   return [
-    { id: 'first-log', icon: '🌟', label: 'First Log', detail: 'Log one meal, water, or movement.', unlocked: allMeals.length + vitals.length + exercises.length > 0 },
-    { id: 'full-day', icon: '🍽️', label: 'Full Day', detail: 'Log 3 meal categories in one day.', unlocked: new Set(todayMeals.map((m) => m.meal)).size >= 3 },
-    { id: 'hydration', icon: '💧', label: 'Hydration Hero', detail: 'Reach 6+ glasses on any day.', unlocked: waterDays > 0 },
-    { id: 'move', icon: '🚶', label: 'Moved Today', detail: 'Log at least 10 minutes of movement.', unlocked: moveDays > 0 },
-    { id: 'family', icon: '👨‍👩‍👧', label: 'Care Circle', detail: 'Invite or create a managed profile.', unlocked: managedCount + inviteCount > 0 },
-    { id: 'consistency', icon: '🔥', label: 'Consistency', detail: 'Track on 3 different days.', unlocked: activeDays >= 3 },
+    { id: 'first-log', icon: 'Start', label: 'First Log', detail: 'Log one meal, water, or movement.', unlocked: allMeals.length + vitals.length + exercises.length > 0 },
+    { id: 'full-day', icon: 'Meal', label: 'Full Day', detail: 'Log 3 meal categories in one day.', unlocked: new Set(todayMeals.map((m) => m.meal)).size >= 3 },
+    { id: 'hydration', icon: 'Water', label: 'Hydration Hero', detail: 'Reach 6+ glasses on any day.', unlocked: waterDays > 0 },
+    { id: 'move', icon: 'Move', label: 'Moved Today', detail: 'Log at least 10 minutes of movement.', unlocked: moveDays > 0 },
+    { id: 'family', icon: 'Family', label: 'Care Circle', detail: 'Invite or create a managed profile.', unlocked: managedCount + inviteCount > 0 },
+    { id: 'consistency', icon: 'Streak', label: 'Consistency', detail: 'Track on 3 different days.', unlocked: activeDays >= 3 },
   ];
 }
 
@@ -186,7 +186,7 @@ export function familyMissions({
   return [
     {
       id: 'family-first-meal',
-      icon: '🍲',
+      icon: 'Meal',
       title: 'Family meal check',
       description: 'Log at least one meal for yourself or someone you care for.',
       cta: 'Log meal',
@@ -198,7 +198,7 @@ export function familyMissions({
     },
     {
       id: 'water-round',
-      icon: '💧',
+      icon: 'Water',
       title: 'Water round',
       description: 'Do a quick water reminder for the family and log your own water.',
       cta: 'Open vitals',
@@ -210,7 +210,7 @@ export function familyMissions({
     },
     {
       id: 'move-together',
-      icon: '🚶',
+      icon: 'Move',
       title: 'Move together',
       description: 'Take a short family walk, stretch, or light activity session.',
       cta: 'Log movement',
@@ -222,7 +222,7 @@ export function familyMissions({
     },
     {
       id: 'care-setup',
-      icon: '🤝',
+      icon: 'Care',
       title: 'Build your care circle',
       description: 'Invite a family member or create a managed profile for an elder/child.',
       cta: 'Set up family',
@@ -234,7 +234,7 @@ export function familyMissions({
     },
     {
       id: 'three-meals',
-      icon: '🌙',
+      icon: 'Day',
       title: 'Complete meal rhythm',
       description: 'Try to log breakfast, lunch, and dinner without chasing perfection.',
       cta: 'Add food',
