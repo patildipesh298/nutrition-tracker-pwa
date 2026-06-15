@@ -6,7 +6,6 @@
 
 ## Test results
 - [ ] `npm ci --no-audit --no-fund --prefer-offline`
-- [ ] `npm run check:env`
 - [ ] `npm run typecheck`
 - [ ] `npm run lint`
 - [ ] `npm run build`
