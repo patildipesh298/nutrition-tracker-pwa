@@ -125,21 +125,21 @@ function RingMetric({
   value,
   target,
   unit,
-  emoji,
+  marker,
   tone,
 }: {
   label: string;
   value: number;
   target: number;
   unit: string;
-  emoji: string;
+  marker: string;
   tone: "calories" | "protein" | "carbs" | "fat";
 }) {
   const progress = pct(value, target);
   return (
     <div className={`ring-metric ${tone}`}>
       <div className="ring-icon" aria-hidden="true">
-        {emoji}
+        {marker}
       </div>
       <div
         className="ring-visual"
@@ -278,12 +278,12 @@ export default function ClientDashboard() {
   const microCovered = (key: "potassium" | "calcium" | "iron" | "vitaminC") =>
     dayMeals.some((m) => (m as any)[key] !== undefined && (m as any)[key] !== null);
   const focusCandidates = [
-    { key: "protein", label: "Protein", icon: "🍗", value: totals.p, target: t.protein, unit: "g", tip: "Add dal, eggs, paneer, curd or chicken.", tracked: true },
-    { key: "fiber", label: "Fiber", icon: "🌾", value: totals.fiber, target: t.fiber, unit: "g", tip: "Add salad, fruit, beans or oats.", tracked: true },
-    { key: "potassium", label: "Potassium", icon: "🍌", value: totals.potassium, target: t.potassium, unit: "mg", tip: "Banana, spinach, beans and curd help.", tracked: microCovered("potassium") },
-    { key: "calcium", label: "Calcium", icon: "🥛", value: totals.calcium, target: t.calcium, unit: "mg", tip: "Milk, curd, paneer, tofu or ragi.", tracked: microCovered("calcium") },
-    { key: "iron", label: "Iron", icon: "🥬", value: totals.iron, target: t.iron, unit: "mg", tip: "Spinach, dal, jaggery and sprouts.", tracked: microCovered("iron") },
-    { key: "vitaminC", label: "Vitamin C", icon: "🍊", value: totals.vitaminC, target: t.vitaminC, unit: "mg", tip: "Citrus, guava, amla or peppers.", tracked: microCovered("vitaminC") },
+    { key: "protein", label: "Protein", icon: "Protein", value: totals.p, target: t.protein, unit: "g", tip: "Add dal, eggs, paneer, curd or chicken.", tracked: true },
+    { key: "fiber", label: "Fiber", icon: "Fiber", value: totals.fiber, target: t.fiber, unit: "g", tip: "Add salad, fruit, beans or oats.", tracked: true },
+    { key: "potassium", label: "Potassium", icon: "K", value: totals.potassium, target: t.potassium, unit: "mg", tip: "Banana, spinach, beans and curd help.", tracked: microCovered("potassium") },
+    { key: "calcium", label: "Calcium", icon: "Ca", value: totals.calcium, target: t.calcium, unit: "mg", tip: "Milk, curd, paneer, tofu or ragi.", tracked: microCovered("calcium") },
+    { key: "iron", label: "Iron", icon: "Fe", value: totals.iron, target: t.iron, unit: "mg", tip: "Spinach, dal, jaggery and sprouts.", tracked: microCovered("iron") },
+    { key: "vitaminC", label: "Vitamin C", icon: "C", value: totals.vitaminC, target: t.vitaminC, unit: "mg", tip: "Citrus, guava, amla or peppers.", tracked: microCovered("vitaminC") },
   ];
   const focusNutrients = focusCandidates
     .filter((x) => x.tracked)
@@ -372,7 +372,7 @@ export default function ClientDashboard() {
               day.
             </p>
           </div>
-          <div className="streak-pill">🔥 {Math.max(streak.streak, 0)}</div>
+          <div className="streak-pill"><TrendingUp size={16} /> {Math.max(streak.streak, 0)}</div>
         </div>
         <DateStrip selected={selectedDate} onSelect={setSelectedDate} />
       </section>
@@ -386,7 +386,7 @@ export default function ClientDashboard() {
           value={totals.cal}
           target={t.calories}
           unit=" kcal"
-          emoji="🔥"
+          marker="Cal"
           tone="calories"
         />
         <RingMetric
@@ -394,7 +394,7 @@ export default function ClientDashboard() {
           value={totals.p}
           target={t.protein}
           unit="g"
-          emoji="🍗"
+          marker="Pro"
           tone="protein"
         />
         <RingMetric
@@ -402,7 +402,7 @@ export default function ClientDashboard() {
           value={totals.c}
           target={carbsTarget}
           unit="g"
-          emoji="🌾"
+          marker="Carb"
           tone="carbs"
         />
         <RingMetric
@@ -410,7 +410,7 @@ export default function ClientDashboard() {
           value={totals.f}
           target={fatTarget}
           unit="g"
-          emoji="🥑"
+          marker="Fat"
           tone="fat"
         />
       </section>

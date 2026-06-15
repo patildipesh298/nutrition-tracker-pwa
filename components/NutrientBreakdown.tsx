@@ -52,10 +52,10 @@ function RowLine({ row }: { row: Row }) {
 
 function mealIcon(meal: string) {
   const m = meal.toLowerCase();
-  if (m.includes("breakfast")) return "🌤️";
-  if (m.includes("lunch")) return "🍱";
-  if (m.includes("dinner")) return "🍽️";
-  return "🍎";
+  if (m.includes("breakfast")) return "AM";
+  if (m.includes("lunch")) return "Mid";
+  if (m.includes("dinner")) return "PM";
+  return "Snack";
 }
 
 export default function NutrientBreakdown({

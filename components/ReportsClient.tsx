@@ -183,10 +183,10 @@ export default function ReportsClient() {
     (m) => m.potassium != null || m.calcium != null || m.iron != null || m.vitaminA != null || m.vitaminC != null,
   );
   const microAdequacy = [
-    { label: "Calcium", icon: "🥛", avg: avg7(calciumSeries), target: t.calcium, unit: "mg" },
-    { label: "Iron", icon: "🥬", avg: avg7(ironSeries), target: t.iron, unit: "mg" },
-    { label: "Potassium", icon: "🍌", avg: avg7(potassiumSeries), target: t.potassium, unit: "mg" },
-    { label: "Vitamin C", icon: "🍊", avg: avg7(daily.map((d) => Math.round(d.vitaminC || 0))), target: t.vitaminC, unit: "mg" },
+    { label: "Calcium", icon: "Ca", avg: avg7(calciumSeries), target: t.calcium, unit: "mg" },
+    { label: "Iron", icon: "Fe", avg: avg7(ironSeries), target: t.iron, unit: "mg" },
+    { label: "Potassium", icon: "K", avg: avg7(potassiumSeries), target: t.potassium, unit: "mg" },
+    { label: "Vitamin C", icon: "C", avg: avg7(daily.map((d) => Math.round(d.vitaminC || 0))), target: t.vitaminC, unit: "mg" },
   ];
   const totalConsumed = consumed.reduce((a, x) => a + x, 0);
   const totalBurned = burned.reduce((a, x) => a + x, 0);
